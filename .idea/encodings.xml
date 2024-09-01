@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Core/Src/delay.c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Core/Src/main.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Drivers/LCD/lcd.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Drivers/LCD/lcdfont.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Drivers/LED/led.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Drivers/delay/delay.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Drivers/delay/delay.h" charset="GBK" />
+  </component>
+</project>

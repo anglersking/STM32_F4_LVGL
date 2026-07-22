@@ -23,22 +23,9 @@
 /* USER CODE BEGIN Includes */
 
 #include "../../Drivers/lvgl/src/lv_init.h"
-#include "delay.h"
-#include "../../Drivers/LED/led.h"
-#include "../../Drivers/LCD/lcd_init.h"
-#include "../../Drivers/LCD/lcd.h"
-#include "../../Drivers/LCD/pic.h"
-#include "../../Drivers/lvgl/src/display/lv_display.h"
-
-#include "../../Drivers/lvgl/demos/widgets/lv_demo_widgets.h"
-#include "lvgl/demos/multilang/lv_demo_multilang.h"
-#include "lvgl/demos/flex_layout/lv_demo_flex_layout.h"
-#include "lvgl/examples/porting/lv_port_disp.h"
-//#include "bsp_ili9341_lcd.h"
-//#include "bsp_xpt2046_lcd.h"
-//#include "lv_port_disp.h"
-//#include "lv_port_indev.h"
-//#include "lv_demo_widgets.h"
+#include "../../Drivers/lvgl/src/lvgl.h"
+#include "../../Drivers/lvgl/examples/porting/lv_port_disp.h"
+#include "../../Drivers/lvgl/demos/scroll/lv_demo_scroll.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -75,9 +62,6 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define  DISPLAY_WIDTH 172
-#define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /* ∂‘”⁄ RGB565 ¿¥ÀµΩ´ « 2 */
-#define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTE_PER_PIXEL)
 
 /* USER CODE END 0 */
 
@@ -116,35 +100,17 @@ int main(void)
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
   /* USER CODE BEGIN 2 */
-//    float t=0;
-//    delay_init(168);
-//    delay_ms(22000);
     HAL_PCD_DeInit(&hpcd_USB_OTG_FS);
-//    LED_Init();//LED?????
 
-
-
-//    // …Ë÷√USB DP/DM“˝Ω≈Œ™µÕµÁ∆Ω“‘ºı…Ÿ∏…»≈
-//    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET); // USB DP
-//    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET); // USB DM
-
-//    LCD_Init();//LCD?????
-//    LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-//    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET); // USB DP
-//    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET); // USB DM
-////   LED0=0;
     lv_init();
-    HAL_UART_Transmit(&huart1,(uint8_t *) "LCD START\n", 10, 100);
+    HAL_UART_Transmit(&huart1, (uint8_t *)"LCD START\n", 10, 100);
 
-    lv_port_disp_init();    //lvgl œ‘ æΩ”ø⁄≥ı ºªØ£¨∑≈‘⁄lv_init∫Û√Ê
-    static uint8_t buf_1[200];
-    static uint8_t buf_2[200];
-    lv_display_t * disp = lv_display_create(320, 172); /*ª˘±æ≥ı ºªØ£¨ÀÆ∆Ω∫Õ¥π÷±∑÷±Ê¬ “‘œÒÀÿŒ™µ•Œª*/
-//    lv_display_set_flush_cb(disp, my_flush_cb); /*…Ë÷√À¢–¬ªÿµ˜“‘ªÊ÷∆µΩœ‘ æ*/
-//    lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /*…Ë÷√“ª∏ˆ“—≥ı ºªØµƒª∫≥Â«¯*/
-//    lv_demo_scroll();
+    /* LVGL ÊòæÁ§∫Êé•Âè£ÂàùÂßãÂåñÔºàÂÜÖÂê´ LCD_Init + display create + flush_cb + bufferÔºâ */
+    lv_port_disp_init();
+
+    /* ËÆæÁΩÆËÉåÊôØËâ≤Âπ∂ÂêØÂä® scroll demo */
     lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003888), LV_PART_MAIN);
-        lv_demo_scroll();
+    lv_demo_scroll();
 
 
     /* USER CODE END 2 */
@@ -153,28 +119,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-//      LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-//      LCD_Fill(0,0,LCD_W,LCD_H,RED);
-//      LCD_Fill(0,0,LCD_W,LCD_H,GREEN);
-//      LCD_Fill(0,0,LCD_W,LCD_H,BLUE);
-//      LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-//////      LCD_ShowChinese(40,0,"÷–æ∞",RED,WHITE,32,0);
-//      LCD_ShowString(10,33,"HELLO WORLD!",RED,WHITE,32,0);
-////      LCD_ShowIntNum(106,33,LCD_W,3,RED,WHITE,32);
-//      LCD_ShowString(10,66,"SHAN",RED,WHITE,32,0);
-////      LCD_ShowIntNum(106,66,LCD_H,3,RED,WHITE,32);
-////      LCD_ShowFloatNum1(10,99,t,4,RED,WHITE,32);
-//      t+=0.11;
-//      LCD_ShowPicture(160,95,40,40,gImage_1);
       lv_task_handler();
-//      HAL_Delay(5);
-
-
-
-//       HAL_Delay(1);
-//      delay_ms(22000);
-      HAL_UART_Transmit(&huart1,(uint8_t *) "ONE TIME\n", 9, 100);
+      HAL_UART_Transmit(&huart1, (uint8_t *)"ONE TIME\n", 9, 100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

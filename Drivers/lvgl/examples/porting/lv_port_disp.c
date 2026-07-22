@@ -17,14 +17,13 @@
 /*********************
  *      DEFINES
  *********************/
+/* 从 lcd_init.h 获取实际分辨率，USE_HORIZONTAL=2 时 LCD_W=320 LCD_H=172 */
 #ifndef MY_DISP_HOR_RES
-    #warning Please define or replace the macro MY_DISP_HOR_RES with the actual screen width, default value 320 is used for now.
-    #define MY_DISP_HOR_RES    320
+    #define MY_DISP_HOR_RES    LCD_W
 #endif
 
 #ifndef MY_DISP_VER_RES
-    #warning Please define or replace the macro MY_DISP_VER_RES with the actual screen height, default value 240 is used for now.
-    #define MY_DISP_VER_RES    240
+    #define MY_DISP_VER_RES    LCD_H
 #endif
 
 /**********************
@@ -63,26 +62,9 @@ void lv_port_disp_init(void)
     lv_display_t * disp = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
     lv_display_set_flush_cb(disp, disp_flush);
 
-    /* Example 1
-     * One buffer for partial rendering*/
-    static lv_color_t buf_1_1[MY_DISP_HOR_RES * 35];                          /*A buffer for 10 rows*/
+    /* One buffer for partial rendering */
+    static lv_color_t buf_1_1[MY_DISP_HOR_RES * 35];
     lv_display_set_buffers(disp, buf_1_1, NULL, sizeof(buf_1_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
-
-//    /* Example 2
-//     * Two buffers for partial rendering
-//     * In flush_cb DMA or similar hardware should be used to update the display in the background.*/
-//    static lv_color_t buf_2_1[MY_DISP_HOR_RES * 10];
-//    static lv_color_t buf_2_2[MY_DISP_HOR_RES * 10];
-//    lv_display_set_buffers(disp, buf_2_1, buf_2_2, sizeof(buf_2_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
-//
-//    /* Example 3
-//     * Two buffers screen sized buffer for double buffering.
-//     * Both LV_DISPLAY_RENDER_MODE_DIRECT and LV_DISPLAY_RENDER_MODE_FULL works, see their comments*/
-//    static lv_color_t buf_3_1[MY_DISP_HOR_RES * MY_DISP_VER_RES];
-//    static lv_color_t buf_3_2[MY_DISP_HOR_RES * MY_DISP_VER_RES];
-//    lv_display_set_buffers(disp, buf_3_1, buf_3_2, sizeof(buf_3_1), LV_DISPLAY_RENDER_MODE_DIRECT);
-
-
 }
 
 /**********************
@@ -92,10 +74,7 @@ void lv_port_disp_init(void)
 /*Initialize your display and the required peripherals.*/
 static void disp_init(void)
 {
-    /*You code here*/
-    LCD_Init();//LCD?????
-
-
+    LCD_Init();
 }
 
 volatile bool disp_flush_enabled = true;
@@ -121,26 +100,22 @@ void disp_disable_update(void)
 static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t * px_map)
 {
     if(disp_flush_enabled) {
-        /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
+        int32_t x, y;
+        uint16_t *color_p = (uint16_t *)px_map;
 
-        int32_t x;
-        int32_t y;
+        /* 设置 LCD 写入区域 */
+        LCD_Address_Set(area->x1, area->y1, area->x2, area->y2);
+
+        /* 逐像素写入缓冲区数据 */
         for(y = area->y1; y <= area->y2; y++) {
             for(x = area->x1; x <= area->x2; x++) {
-                /*Put a pixel to the display. For example:*/
-                /*put_px(x, y, *px_map)*/
-                LCD_Fill(area->x1,area->y1,area->x2,area->y2,(u16 *)px_map);
-
-                px_map++;
+                LCD_WR_DATA(*color_p++);
             }
         }
     }
 
-
-
-
-    /*IMPORTANT!!!
-     *Inform the graphics library that you are ready with the flushing*/
+    /* IMPORTANT!!!
+     * Inform the graphics library that you are ready with the flushing */
     lv_display_flush_ready(disp_drv);
 }
 
